@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\students;
+use App\Http\Resources\StudentResource;
+use Validator;
+
 
 class StudentController extends Controller
 {
@@ -100,5 +103,46 @@ class StudentController extends Controller
         $student->delete();
 
         return redirect('/student');
+    }
+
+    public function add_student_api(Request $request)
+    {
+        $student = new Students;
+        // print_r($request->student_name);die;
+
+        $student->name = $request->student_name;
+        $student->phone_number = $request->phone_number;
+        $student->email = $request->email;
+        $student->country = $request->country;
+        $student->country_code = $request->country_code;
+
+        $rules = array(
+         'student_name' => 'required',
+         'phone_number' => 'required',
+         'email' => 'required|email',
+         'country' => 'required',
+         'country_code' => 'required',
+        );
+        $validaor = Validator::make($request->all(), $rules);
+        if ($validaor->fails()) {
+            return response()->json($validaor->errors(), 203); 
+        }else{
+            $student->save();
+            return response()->json('Student Added Successfully', 200);
+        }
+        
+    }
+
+    public function all_students($search_key="")
+    {   
+        if (!empty($search_key)) {
+            $students = Students::where('name', 'LIKE', "%{$search_key}%")->orWhere('phone_number', 'LIKE', "%{$search_key}%")->orWhere('email', 'LIKE', "%{$search_key}%")->orWhere('country', 'LIKE', "%{$search_key}%")->get();
+        }else{
+            $students = Students::all();
+        }
+        if (is_null($students)) {
+            return response()->json('Data not found', 404); 
+        }
+        return response()->json($students);
     }
 }

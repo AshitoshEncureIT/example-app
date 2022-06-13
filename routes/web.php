@@ -34,3 +34,5 @@ Route::post('/student/add_student', [StudentController::class,'add_student']);
 Route::get('student/edit/{id}', [StudentController::class,'edit_student_form']);
 Route::post('/student/update_student', [StudentController::class,'update_student']);
 Route::get('student/delete/{id}', [StudentController::class,'delete_student']);
+
+
